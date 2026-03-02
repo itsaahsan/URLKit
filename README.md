@@ -2,7 +2,13 @@
 
 A full-stack URL shortener with real-time analytics, QR code generation, and a modern dashboard built with React and Django.
 
-![Tech Stack](https://img.shields.io/badge/React-18-61DAFB?logo=react) ![Tech Stack](https://img.shields.io/badge/Django-4.2-092E20?logo=django) ![Tech Stack](https://img.shields.io/badge/MongoDB-4.8-47A248?logo=mongodb) ![Tech Stack](https://img.shields.io/badge/TypeScript-5.5-3178C6?logo=typescript) ![Tech Stack](https://img.shields.io/badge/TailwindCSS-3.4-06B6D4?logo=tailwindcss)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)
+![Django](https://img.shields.io/badge/Django-4.2-092E20?logo=django)
+![MongoDB](https://img.shields.io/badge/MongoDB-PyMongo-47A248?logo=mongodb)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?logo=typescript)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-06B6D4?logo=tailwindcss)
+
+---
 
 ## Features
 
@@ -11,6 +17,8 @@ A full-stack URL shortener with real-time analytics, QR code generation, and a m
 - **QR Code Generation** — 4 styles (rounded, square, circle, gapped) with custom colors
 - **Expiry Support** — Optional expiration dates for short URLs
 - **Async Click Tracking** — Background thread logging with zero redirect latency impact
+
+---
 
 ## Tech Stack
 
@@ -21,26 +29,30 @@ A full-stack URL shortener with real-time analytics, QR code generation, and a m
 | Database | MongoDB (via PyMongo) |
 | QR Codes | Python `qrcode` library with styled output |
 
+---
+
 ## Architecture Highlights
 
 ### Base62 Encoding
-Generates short, URL-safe, human-readable codes using `[a-zA-Z0-9]`. Includes collision detection with retry logic.
+Generates short, URL-safe, human-readable codes using `[a-zA-Z0-9]`. Includes collision detection with retry logic. 62^6 = **56 billion unique combinations**.
 
 ### Atomic Click Counting
 Uses MongoDB `$inc` operator for thread-safe click counting — no read-modify-write cycle, handles concurrent clicks correctly.
 
 ### Async Analytics (Non-Blocking)
-Redirect completes in <5ms. Detailed click data (browser, OS, device, referrer) is logged in a background thread using fire-and-forget pattern.
+Redirect completes in **<5ms**. Detailed click data (browser, OS, device, country, referrer) is logged in a background thread using fire-and-forget pattern.
 
 ### MongoDB Aggregation Pipelines
 Real-time analytics powered by native MongoDB aggregation (`$group`, `$sort`, `$limit`) — no separate analytics database needed.
 
-### Optimized Indexes
+### Optimized Indexes (No Redis Needed)
 ```python
 db.urls.create_index("short_code", unique=True)
 db.clicks.create_index([("short_code", ASCENDING), ("clicked_at", ASCENDING)])
 ```
-Compound indexes achieve sub-10ms query times without Redis.
+Compound indexes achieve **sub-10ms query times** without Redis.
+
+---
 
 ## Project Structure
 
@@ -71,6 +83,8 @@ URLKit/
 │           └── QRCodeModal.tsx
 ```
 
+---
+
 ## API Endpoints
 
 | Method | Endpoint | Description |
@@ -96,6 +110,8 @@ URLKit/
 
 Query params: `fill` (hex color), `bg` (hex color), `style` (rounded|square|circle|gapped)
 
+---
+
 ## Getting Started
 
 ### Prerequisites
@@ -120,9 +136,9 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000 in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Environment Variables (optional)
+### Environment Variables
 
 Create `backend/.env`:
 
@@ -134,13 +150,16 @@ BASE_URL=http://localhost:8000
 DEBUG=True
 ```
 
-## Screenshots
+---
 
-### URL Shortening
-Paste a URL, optionally set a custom alias and expiry, click Shorten.
+## Deployment
 
-### Analytics Dashboard
-View clicks over time (line chart), browser distribution (pie chart), device breakdown, OS stats, and top referrers.
+| Service | Platform | Notes |
+|---------|----------|-------|
+| Database | MongoDB Atlas | Free tier available |
+| Backend API | Render | Connect GitHub repo, set env vars |
+| Frontend | Vercel | Auto-deploy on push |
 
-### QR Code Generator
-Generate QR codes with 4 module styles and custom fill/background colors. Download as PNG.
+---
+
+*Built for portfolio demonstration purposes.*
