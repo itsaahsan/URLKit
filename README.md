@@ -137,7 +137,6 @@ DEBUG=True
 ## Screenshots
 
 ### URL Shortening
-![URL Shortening](Screenshot 2026-03-02 115649.png)
 Paste a URL, optionally set a custom alias and expiry, click Shorten.
 
 ### Analytics Dashboard
